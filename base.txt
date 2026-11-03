@@ -1,0 +1,703 @@
+# Deadlock Patch Archive - MVP仕様書
+
+**Version:** 1.0  
+**Status:** Implementation Specification  
+**Target:** GitHub Copilot  
+**Project Type:** Personal Web Application
+
+---
+
+# 1. プロジェクト概要
+
+## 1.1 目的
+
+Deadlockのパッチノートを蓄積し、過去の変更内容を横断的に検索・閲覧できる個人用Webアプリケーションを開発する。
+
+ゲーム内の変更履歴を単純に保存するだけでなく、ヒーロー・スキル・アイテムなどの対象ごとに変更履歴を整理し、過去のパッチ間で変更内容を比較できることを主目的とする。
+
+## 1.2 基本方針
+
+- 対象ゲームはDeadlockのみ。
+- 主目的はPatch ArchiveおよびSearch。
+- パッチノート原文は `patchnote/` 配下で管理し、ビルド時に標準JSONへ変換する。
+- 将来的な自動取得を妨げないデータ構造にする。
+- BUFF / NERFの評価は手動設定のみとする。
+- 原文と構造化データの両方を保持する。
+- 個人利用を前提とし、ユーザー認証や複数ユーザー対応は不要。
+- GitHub Pagesで動作する静的Webアプリケーションとする。
+- サーバー・外部DB・有料APIなどのランニングコストを発生させない。
+
+## 1.3 最優先要件
+
+**GitHub Pages上で正常に動作し、金銭的な維持コストを0円にすること。**
+
+この要件を満たすため、以下を禁止する。
+
+- バックエンドサーバーの導入
+- 外部データベースの利用
+- 有料APIの利用
+- 常時稼働するWorkerやサーバーレス環境への依存
+- 外部サービスを必須とする認証機能
+- アプリケーションの基本機能を外部CDNやAPIに依存させること
+
+GitHubの無料利用条件内で運用することを前提とする。
+
+---
+
+# 2. 技術構成
+
+## 2.1 採用技術
+
+| 項目 | 技術 |
+|---|---|
+| フロントエンド | React |
+| ビルドツール | Vite |
+| 言語 | TypeScript |
+| データ形式 | JSON |
+| 標準データ | `patchnote/` のGit管理テキストからビルド時に生成するJSON |
+| 既存ユーザーデータ | IndexedDBから読み込み（画面からの管理機能なし） |
+| UI設定 | localStorage |
+| ホスティング | GitHub Pages |
+| CI/CD | GitHub Actions |
+
+必要以上に複雑なライブラリを導入しないこと。
+
+UIライブラリや状態管理ライブラリは、実装上の必要性を確認してから採用する。
+
+## 2.2 システム構成
+
+```text
+GitHub Repository
+├── Source Code
+├── patchnote/ (Patch source text)
+├── Static Assets
+└── GitHub Actions
+       |
+       | Build & Deploy
+       v
+GitHub Pages
+       |
+       v
+User Browser
+├── React Application
+├── IndexedDB
+│   ├── Existing User Patches (read-only in the app)
+│   └── Existing Overrides (read-only in the app)
+└── localStorage
+    └── UI Settings
+```
+
+アプリケーション実行時にバックエンドとの通信は行わない。
+
+標準パッチはビルド時に `patchnote/` のテキストからJSONへ変換する。ブラウザー上でのパッチ原文の取り込み・登録は行わない。
+
+## 2.3 GitHub Pages対応
+
+- Viteの`base`をGitHub Pagesの公開パスに合わせる。
+- GitHub Pagesで直接アクセス・リロードしても404にならないようにする。
+- SPAルーティングにはHashRouterを推奨する。
+- 静的アセットは相対パスまたはViteが解決できるパスで参照する。
+- GitHub Actionsでビルド・デプロイを自動化する。
+
+公開URLのリポジトリ名は環境に依存するため、`base`を設定ファイルで管理すること。
+
+---
+
+# 3. アプリケーション機能
+
+以下の3画面を実装する。
+
+1. Dashboard
+2. Patch Archive
+3. Search
+
+## 3.1 Dashboard
+
+目的：最新のパッチ情報とアプリケーション全体の概要を確認する。
+
+表示項目：
+
+- 最新パッチのタイトル
+- 最新パッチの日付
+- 最新パッチの変更件数
+- BUFF / NERF / ADJUST / UNRATEDの集計
+- 最近登録したパッチ
+- Searchへの導線
+
+装飾や統計表示を過剰に増やさないこと。
+
+## 3.2 Patch Archive
+
+目的：パッチ単位で変更内容を閲覧する。
+
+必要機能：
+
+- パッチ一覧
+- パッチ選択
+- 前後のパッチへの移動
+- パッチの日付・タイトル表示
+- セクション切り替え
+- 変更グループの表示
+- 親グループの折りたたみ
+- 子変更の表示
+- BUFF / NERF / ADJUST / UNRATEDの表示
+- 原文の確認
+
+セクション：
+
+- General
+- Items
+- Heroes
+- Street Brawl
+
+変更は対象単位の親グループにまとめ、個別変更を子要素として表示する。
+
+例：
+
+```text
+Shadow Weave [ADJUST]
+├── Ambush Fire Rate / Melee Damage
+│   └── 削除
+├── Ambush Weapon Damage
+│   └── +50%
+└── Ambush Bonus
+    └── ステルス状態を6秒維持すると最大効果
+```
+
+親と子の評価は独立した値として表示する。画面からの評価編集は行わない。
+
+## 3.3 Search
+
+目的：全パッチを横断して変更履歴を検索する。
+
+検索対象：
+
+- ヒーロー名
+- アイテム名
+- スキル名
+- 変更内容
+- 変更前・変更後の数値
+- 原文
+
+絞り込み条件：
+
+| 条件 | 内容 |
+|---|---|
+| Patch | 特定パッチ・期間 |
+| Section | General / Items / Heroes / Street Brawl |
+| Entity | ヒーロー・アイテムなどの対象 |
+| Change Type | 変更種別 |
+| Balance Assessment | BUFF / NERF / ADJUST / UNRATED |
+
+検索結果は個別変更を単位として表示する。
+
+各検索結果に以下を表示する。
+
+- パッチタイトル・日付
+- 親グループ名
+- 個別変更の説明
+- BUFF / NERFなどの評価
+- セクション
+
+検索結果を選択すると、該当パッチの該当グループへ移動できるようにする。
+
+未評価の変更も通常の検索対象に含める。
+
+---
+
+# 4. データスキーマ
+
+## 4.1 基本構造
+
+データは以下の3階層とする。
+
+```text
+Patch
+└── ChangeGroup
+    └── Change
+```
+
+### Patch
+
+パッチ単位の情報。
+
+### ChangeGroup
+
+変更対象単位の親データ。
+
+例：
+
+- Abrams
+- Shadow Weave
+- Mid-Boss
+- Haunts - Past Dues
+
+### Change
+
+個別の変更内容。
+
+例：
+
+- Base gun damage increased by 5%
+- Cooldown increased from 46s to 50s
+- Ambush Fire Rate removed
+
+## 4.2 TypeScript型定義
+
+以下を基本型とする。
+
+```typescript
+type PatchSection =
+  | "general"
+  | "items"
+  | "heroes"
+  | "street_brawl";
+
+type EntityType =
+  | "world"
+  | "hero"
+  | "item"
+  | "skill"
+  | "system";
+
+type ChangeType =
+  | "value_increased"
+  | "value_decreased"
+  | "added"
+  | "removed"
+  | "behavior_changed"
+  | "bug_fix"
+  | "visual_change"
+  | "other";
+
+type BalanceAssessment =
+  | "buff"
+  | "nerf"
+  | "adjust"
+  | "unrated";
+
+type NumericChange = {
+  attribute: string;
+  before?: number | string;
+  after?: number | string;
+  unit?: string;
+};
+
+type Change = {
+  id: string;
+  targetName?: string;
+  description: string;
+  changeType: ChangeType;
+  numericChanges?: NumericChange[];
+  balanceAssessment: BalanceAssessment;
+  sourceLineIds: string[];
+};
+
+type ChangeGroup = {
+  id: string;
+  section: PatchSection;
+  entityType: EntityType;
+  entityId: string;
+  entityName: string;
+  gameMode?: string;
+  balanceAssessment: BalanceAssessment;
+  changes: Change[];
+};
+
+type SourceLine = {
+  id: string;
+  section: PatchSection;
+  text: string;
+};
+
+type Patch = {
+  schemaVersion: 1;
+  id: string;
+  game: "deadlock";
+  title: string;
+  publishedAt?: string;
+  importedAt: string;
+  sourceLines: SourceLine[];
+  changeGroups: ChangeGroup[];
+};
+```
+
+必要に応じて型の拡張は可能だが、MVPではこの構造を基本とする。
+
+## 4.3 Change TypeとBalance Assessmentの分離
+
+変更の事実とゲーム上の評価を混同しない。
+
+### Change Type
+
+実際に何が変更されたかを表す。
+
+例：
+
+- value_increased
+- value_decreased
+- added
+- removed
+- behavior_changed
+- bug_fix
+
+### Balance Assessment
+
+変更が対象にとってどのような強弱をもたらすかを表す。
+
+例：
+
+- buff
+- nerf
+- adjust
+- unrated
+
+数値が増えたからといって自動的にBUFFにしてはならない。
+
+例：
+
+Cooldownが増加した場合、通常は弱体化方向の変更だが、ゲーム上の影響は変更内容によって異なる。
+
+評価は自動判定せず、データ側で手動設定する。アプリ画面では評価を表示し、編集は行わない。
+
+## 4.4 親子評価の扱い
+
+親と子の`balanceAssessment`は独立した値として保持する。
+
+- 親の評価を子に自動継承しない。
+- 子の評価から親の評価を自動計算しない。
+- 未設定の評価は`unrated`とする。
+- 自動評価機能はMVPでは実装しない。
+
+将来、自動判定を導入する場合も、手動評価を上書きしない別フィールドに保存すること。
+
+## 4.5 原文での手動評価指定
+
+変更行の末尾に次の形式の注釈を付け、個別変更（子）の`balanceAssessment`を設定する。
+
+```text
+- High-Velocity Rounds: Bullet Velocity reduced from 60% to 45% [BalanceAssessment:"nerf"]
+```
+
+- 使用できる値は`buff`、`nerf`、`adjust`、`unrated`（小文字）とする。
+- 注釈は構造化された変更内容から除去し、原文行には注釈を含めたまま保持する。
+- 注釈がない変更は`unrated`とする。
+- 注釈はその行に対応する子変更だけに適用し、親グループへ継承・集計しない。
+- 不正な値または複数の注釈は警告を出し、その変更を`unrated`とする。
+- 画面からの評価編集は行わず、評価の修正は原文の注釈を変更して行う。
+
+## 4.6 グループ化ルール
+
+基本的に以下の組み合わせで親グループを識別する。
+
+```text
+Patch ID
++ Section
++ Entity ID
+```
+
+同一パッチ・同一セクション・同一対象の変更は同じ親グループにまとめる。
+
+セクションが異なる場合は別グループとする。
+
+例：
+
+- Heroes内のAbrams
+- Street Brawl内のAbrams
+
+これらは別グループとして扱う。
+
+スキル名は原則として子の`targetName`に保持する。
+
+---
+
+# 5. 原文行管理
+
+## 5.1 sourceLinesの保持
+
+`sourceLines`には変更内容として解析した行を保存し、構造化データとの対応関係を管理する。
+
+各Changeは`sourceLineIds`を持ち、原文のどの行を根拠としているかを追跡できるようにする。
+
+## 5.2 sourceLinesと構造化データの役割
+
+| データ | 用途 |
+|---|---|
+| sourceLines | 変更内容の原文行管理 |
+| ChangeGroup | 対象単位の整理 |
+| Change | 検索・表示・分類 |
+
+原文行は`sourceLines`に保持し、構造化データと対応付ける。
+
+---
+
+# 6. Parser仕様
+
+## 6.1 基本方針
+
+MVPではルールベースのParserを実装する。
+
+最初から完全な自然言語解析を目指さない。
+
+Parserは原文を構造化データの下書きへ変換する役割に限定する。
+
+## 6.2 解析対象
+
+- セクション見出し
+- 変更行
+- 対象名
+- スキル名
+- 数値変更
+- 変更種別候補
+
+## 6.3 解析ルール
+
+例：
+
+```text
+Heroes:
+- Abrams: Base gun damage increased by 5%
+- Abrams: Siphon Life - T3 increased from +18 DPS to +22
+- Abrams: Shoulder Charge - Fixed enemies being held in place longer...
+```
+
+期待する構造：
+
+```text
+Abrams
+├── Base gun damage increased by 5%
+├── Siphon Life - T3 increased from +18 DPS to +22
+└── Shoulder Charge - Fixed ...
+```
+
+以下のような形式を考慮する。
+
+- `Heroes:`などのセクション見出し
+- `- Abrams:`のような対象名の接頭辞
+- `- Abrams: Siphon Life - ...`のようなスキル名を含む記述
+- 同一対象の複数行
+- General内のNPCやゲームシステム
+- Street Brawlの変更
+- 数値以外の仕様変更
+- 不具合修正
+
+## 6.4 Parserの制約
+
+Parserが判断できない情報は無理に補完しない。
+
+- 不明な対象名は警告する。
+- 不明な変更種別は`other`候補とする。
+- 数値を正しく抽出できない場合は無理に数値化しない。
+- BUFF / NERFは自動判定しない。
+- 解析に失敗した行も原文から失われないようにする。
+
+---
+
+# 7. データ保存設計
+
+## 7.1 保存先
+
+データは以下の3種類に分ける。
+
+| 保存先 | 内容 |
+|---|---|
+| ビルド生成JSON | `patchnote/` の原文から生成する標準パッチデータ |
+| IndexedDB | 既存ユーザーデータ・Override（読み込みのみ） |
+| localStorage | UI設定・検索条件 |
+
+## 7.2 標準データ
+
+標準データは `patchnote/` 直下のテキストファイル（`.txt`、`.text`、拡張子なし）をビルド時にJSONへ変換して生成する。`patchnote_YYYYMMDD` のようにファイル名末尾に日付がある場合、その日付を公開日に使う。原文の先頭の空でない行をタイトルとして扱う。アプリ実行時は生成済みJSONを読み取り、画面上で原文を取り込まない。開発サーバーでも同じ変換結果を配信する。
+
+例：
+
+```text
+patchnote/
+├── patchnote_20261031.txt
+└── ...
+
+dist/
+└── data/
+    └── patches/
+        ├── index.json
+        └── <patch-id>.json
+```
+
+標準データは読み取り専用とする。原文の追加・変更は `patchnote/` のファイルに対して行い、Gitの差分管理を利用する。
+
+## 7.3 ユーザーデータ
+
+既存のユーザーパッチとOverrideはIndexedDBに保持し、Patch ArchiveとSearchで読み込む。アプリにはData Management画面がなく、ユーザーデータの新規登録・編集・削除、バックアップのインポート・エクスポート機能は提供しない。
+
+ブラウザ内で完結させ、外部DBへの通信は行わない。
+
+## 7.4 Override
+
+IndexedDBに既存のOverrideがある場合は保持し、関連する画面で読み込む。現在の画面からOverrideを新規作成・編集・削除する機能は提供しない。
+
+Overrideが保持できる差分対象：
+
+- BUFF / NERFなどの評価
+- 説明文の編集
+- その他ユーザーによる変更
+
+標準データの更新後も既存Overrideを維持できる構造にする。
+
+Overrideの対象を識別するため、Patch ID / ChangeGroup ID / Change IDを使用する。
+
+# 8. UI / UX方針
+
+- 暗色テーマを基本とする。
+- 情報密度を重視する。
+- 不要なアニメーションを避ける。
+- 親グループは折りたたみ可能にする。
+- 変更種別と強弱評価を視覚的に区別する。
+- 原文を確認できる導線を設ける。
+- 検索操作を少ない手順で行えるようにする。
+
+アイコン・ゲーム画像は正式な取得元と利用条件を確認してから採用する。
+
+画像取得のための外部APIやCDNを必須にしない。
+
+---
+
+# 9. MVPの実装対象外
+
+以下はMVPでは実装しない。
+
+| 機能 | 理由 |
+|---|---|
+| パッチ原文の自動取得 | 初期は手動で `patchnote/` に追加 |
+| BUFF / NERFの自動判定 | 手動評価を正とする |
+| 自動評価候補の生成 | 将来検討 |
+| ユーザー認証 | 個人利用 |
+| 複数ユーザー対応 | 個人利用 |
+| クラウド同期 | 維持コスト0円を優先 |
+| 外部DB | 不要 |
+| 詳細な統計・グラフ | Archive/Searchを優先 |
+| 自動画像取得 | 初期優先度が低い |
+
+---
+
+# 10. 実装チケット
+
+以下の順序で段階的に実装する。
+
+## Phase 1：基盤構築
+
+### M01：プロジェクト初期構築
+- Vite + React + TypeScript
+- 基本ディレクトリ構成
+- 開発環境の整備
+
+### M02：GitHub Pages対応
+- Vite base設定
+- HashRouter
+- GitHub Pagesでの直リンク・リロード対策
+- GitHub Actionsによるデプロイ
+
+### M03：データ型定義
+- Patch
+- ChangeGroup
+- Change
+- SourceLine
+- NumericChange
+- JSONバリデーション
+
+### M04：標準データ読み込み
+- patchnote/の原文をビルド時にJSONへ変換する
+- 生成した標準JSONを読み込む
+- Patch一覧の取得
+- 標準データを読み取り専用として扱う
+
+## Phase 2：既存データの読み込み
+
+### M05：既存IndexedDBデータの読み込み
+- 保存済みユーザーパッチの読み込み
+- 保存済みOverrideの読み込み
+
+## Phase 3：閲覧・検索
+
+### M06：Patch Archive
+- パッチ一覧
+- セクション切り替え
+- 親子構造表示
+- 評価表示
+- 原文表示
+- 既存Overrideの読み込み
+
+### M07：Search
+- 全パッチ横断検索
+- 条件フィルター
+- 検索結果表示
+- 該当パッチ・変更への移動
+
+### M08：Dashboard
+- 最新パッチ表示
+- 変更件数
+- 評価別集計
+- 最近のパッチ
+- 検索導線
+
+## Phase 4：検証
+
+### M09：CI/CD検証
+- GitHub Actions
+- ビルド成功確認
+- Pagesデプロイ確認
+
+### M10：総合テスト
+- patchnote原文のJSON変換
+- 原文保持
+- 親子構造
+- 既存Overrideの読み込み
+- 検索
+- リロード後のデータ保持
+- GitHub Pagesでの動作確認
+
+---
+
+# 11. MVP受け入れ条件
+
+以下を満たした時点でMVP完成とする。
+
+- [ ] GitHub Pagesでアプリが正常に動作する。
+- [ ] GitHub PagesのURLを直接開いて表示できる。
+- [ ] ページをリロードしても正常に動作する。
+- [ ] 外部バックエンド・外部DBなしで動作する。
+- [ ] 標準パッチデータをJSONから読み込める。
+- [ ] 既存のIndexedDBデータをPatch ArchiveとSearchで読み込める。
+- [ ] General / Items / Heroes / Street Brawlを区別できる。
+- [ ] 親グループと子変更を管理できる。
+- [ ] 原文と構造化データを両方保持できる。
+- [ ] 原文と構造化データの対応関係を追跡できる。
+- [ ] BUFF / NERF / ADJUST / UNRATEDの評価を表示できる。
+- [ ] UNRATEDの変更も通常表示・検索対象になる。
+- [ ] 検索で過去の変更を横断的に探せる。
+- [ ] 標準データと既存Overrideが分離されている。
+- [ ] 外部サービスへの課金を必要としない。
+
+---
+
+# 12. GitHub Copilotへの実装指示
+
+この仕様書に基づき、以下の方針で開発すること。
+
+1. 最初に既存リポジトリの構成を確認する。
+2. 既存コードがある場合は、無条件に作り直さず再利用可能な部分を調査する。
+3. 仕様書にない機能を独断で追加しない。
+4. データスキーマを先に確定し、画面実装より優先する。
+5. 各Phaseを小さなタスクに分けて実装する。
+6. 各タスクの完了時に変更内容と動作確認結果を報告する。
+7. GitHub Pagesでの動作を常に考慮する。
+8. サーバー・外部DB・有料サービスを導入しない。
+9. BUFF / NERFの自動判定を実装しない。
+10. 原文を失う処理を実装しない。
+11. データの保存・復元に関する処理は、必ず異常系も考慮する。
+12. 仕様上の不明点や矛盾を発見した場合は、実装を進める前に指摘する。
+
+**最初の作業はPhase 1のM01〜M04とする。**
+
+まずリポジトリの現状を調査し、実装計画と変更対象ファイルを提示すること。ユーザーの承認を得てから実装に着手する。
+
+一度に全機能を実装しないこと。
