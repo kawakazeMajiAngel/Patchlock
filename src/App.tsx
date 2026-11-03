@@ -221,7 +221,7 @@ function Archive() {
         </Link>
         <nav className="archive-nav" aria-label="Main navigation">
           <Link to="/search">Search</Link>
-          <Link to="/settings">Settings</Link>
+          {import.meta.env.DEV && <Link to="/settings">Settings</Link>}
         </nav>
       </header>
       {error ? (
@@ -683,8 +683,12 @@ export default function App() {
       <Route path="/" element={<Archive />} />
       <Route path="/archive" element={<Archive />} />
       <Route path="/search" element={<Search />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/assessments" element={<Navigate to="/settings" replace />} />
+      {import.meta.env.DEV && (
+        <>
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/assessments" element={<Navigate to="/settings" replace />} />
+        </>
+      )}
       <Route path="*" element={<Archive />} />
     </Routes>
   );

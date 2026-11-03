@@ -90,6 +90,8 @@ Remove-Item Env:VITE_BASE_PATH
 
 開発サーバーではArchive画面の「Assessments」から、パッチと個別変更の評価を選択してまとめて保存できます。保存すると `patchnote/` の原文が更新されます。この画面と保存APIは開発環境でのみ有効で、本番ビルドには含まれません。
 
+Settings画面（`/settings`）も開発環境でのみ利用できます。本番ビルドではメニューに表示されず、URLへ直接アクセスしてもArchive画面へ戻ります。
+
 将来Assessmentの自動設定を実装する際の判断基準は [`assessment-criteria.md`](./assessment-criteria.md) を参照してください。現状の評価は引き続き原文の注釈で手動設定します。
 
 ヒーローとアイテムの画像は `public/images/heroes/` と `public/images/items/` に置きます。ヒーロー画像はパッチデータの `entityId` に `.png` を付けた名前です（例: `Abrams` は `heroes/abrams.png`）。アイテム画像は `entityId` を小文字化し、`-` を `_` に置き換えた名前に `.png` を付けます（例: `Shadow Weave` は `items/shadow_weave.png`）。画像がない対象には各ディレクトリの `placeholder.svg` が表示されます。
