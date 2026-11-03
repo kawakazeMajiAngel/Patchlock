@@ -108,7 +108,7 @@ Items:
 
 
 Heroes:
-- Abrams: Base gun damage increased by 5%[BalanceAssessment:"buff"]
+- Abrams: Base gun damage increased by 5% [BalanceAssessment:"buff"]
 - Abrams: Siphon Life - T3 increased from +18 DPS to +22[BalanceAssessment:"buff"]
 - Abrams: Shoulder Charge - Fixed enemies being held in place longer if you don't hit a wall[BalanceAssessment:"adjust"]
 
@@ -156,10 +156,10 @@ Heroes:
 
 - Graves: Move speed reduced from 7 to 6.7 [BalanceAssessment:"nerf"]
 - Graves: Bullet damage per boon reduced by 4% [BalanceAssessment:"nerf"]
-- Graves: Grasping Hands - Can now be more easily double jumped over
+- Graves: Grasping Hands - Can now be more easily double jumped over [BalanceAssessment:"nerf"]
 - Graves: Grasping Hands - Deploy time increased from 0.6s to 0.8s [BalanceAssessment:"nerf"]
-- Graves: Borrowed Decree - T2 no longer has -0.3s Time To Spawn
-- Graves: Borrowed Decree - T3 now also provides -0.3s Time To Spawn
+- Graves: Borrowed Decree - T2 no longer has -0.3s Time To Spawn [BalanceAssessment:"adjust"]
+- Graves: Borrowed Decree - T3 now also provides -0.3s Time To Spawn [BalanceAssessment:"adjust"]
 
 - Grey Talon: Charged Shot - T2 now also has -2s Charge Delay [BalanceAssessment:"buff"]
 - Grey Talon: Charged Shot - T3 no longer has -3s Charge Delay [BalanceAssessment:"adjust"]
@@ -173,7 +173,7 @@ Heroes:
 
 - Kelvin: Frozen Shelter - Cooldown increased from 185s to 190s [BalanceAssessment:"nerf"]
 - Kelvin: Frozen Shelter - T1 increased from -20s Cooldown to -30s [BalanceAssessment:"nerf"]
-- Kelvin: Frozen Shelter - T2 now also reduces enemy fire rate by -20% [BalanceAssessment:"nerf"]
+- Kelvin: Frozen Shelter - T2 now also reduces enemy fire rate by -20% [BalanceAssessment:"buff"]
 - Kelvin: Frozen Shelter - T3 regen increased from +65 to +75 [BalanceAssessment:"buff"]
 
 - Lady Geist: Essence Bomb - spirit scaling increased from 1.22 to 1.35 [BalanceAssessment:"buff"]
@@ -184,31 +184,31 @@ Heroes:
 - McGinnis: Mini Turret - Damage vs troopers increased from 50% to 65%[BalanceAssessment:"buff"]
 - McGinnis: Mini Turret - Health per boon increased from 9 to 10[BalanceAssessment:"buff"]
 
-- Mirage: Traveler - Channel time increased from 2s to 3s [BalanceAssessment:"buff"]
-- Mirage: Traveler - Onterrupt/cancel cooldown increased from 4s to 5s [BalanceAssessment:"nerf"]
-- Mirage: Traveler - Now gets interrupted if you are Stunned/Immobilized/Slept or have slowing hex on you
-- Mirage: Traveler - Now grants the old T2 barrier in the base ability (with no scaling)
-- Mirage: Traveler - The minimap now moves to the center of the screen and is enlarged while targeting
-- Mirage: Traveler - Added a targeting reticle under your cursor on the minimap that your allies can see, so they can tell where you're thinking of going before you click
-- Mirage: Traveler - Your destination is now marked on your and your allies' minimaps until you arrive, and stays there briefly after landing
-- Mirage: Traveler - T2 changed from "400 Barrier that scales with spirit" to "-65s Cooldown"
-- Mirage: Traveler - T3 changed from "-90s Cooldown" to "Cannot be interrupted by damage"
-- Mirage: Traveler - T3 now also adds barrier spirit scaling (0.8)
+- Mirage: Traveler - Channel time increased from 2s to 3s [BalanceAssessment:"adjust"]
+- Mirage: Traveler - Onterrupt/cancel cooldown increased from 4s to 5s [BalanceAssessment:"adjust"]
+- Mirage: Traveler - Now gets interrupted if you are Stunned/Immobilized/Slept or have slowing hex on you [BalanceAssessment:"adjust"]
+- Mirage: Traveler - Now grants the old T2 barrier in the base ability (with no scaling) [BalanceAssessment:"buff"]
+- Mirage: Traveler - The minimap now moves to the center of the screen and is enlarged while targeting [BalanceAssessment:"adjust"]
+- Mirage: Traveler - Added a targeting reticle under your cursor on the minimap that your allies can see, so they can tell where you're thinking of going before you click [BalanceAssessment:"adjust"]
+- Mirage: Traveler - Your destination is now marked on your and your allies' minimaps until you arrive, and stays there briefly after landing [BalanceAssessment:"adjust"]
+- Mirage: Traveler - T2 changed from "400 Barrier that scales with spirit" to "-65s Cooldown" [BalanceAssessment:"adjust"]
+- Mirage: Traveler - T3 changed from "-90s Cooldown" to "Cannot be interrupted by damage" [BalanceAssessment:"adjust"]
+- Mirage: Traveler - T3 now also adds barrier spirit scaling (0.8) [BalanceAssessment:"adjust"]
 
-- Mo & Krill: Spirit per boon reduced from 1.1 to 0.6
+- Mo & Krill: Spirit per boon reduced from 1.1 to 0.6 [BalanceAssessment:"nerf"]
 - Mo & Krill: Spirit damage on all abilities reduced by 10% (base values and growth/upgrades) [BalanceAssessment:"nerf"]
 - Mo & Krill: Bullet damage per boon increased by 4% [BalanceAssessment:"buff"]
 
 - Nurse Harrow: Base gun damage reduced by 10% [BalanceAssessment:"nerf"]
 - Nurse Harrow: Leech Therapy - Fixed enemies being unable to see the glow on the hunting leeches
 - Nurse Harrow: Leech Therapy - Fixed leeches attaching to targets while the game is paused
-- Nurse Harrow: Leech Therapy - Fed leeches duration on the ground changed from a fixed 180s to 120s + 3s/min
+- Nurse Harrow: Leech Therapy - Fed leeches duration on the ground changed from a fixed 180s to 120s + 3s/min [BalanceAssessment:"adjust"]
 - Nurse Harrow: Wretched Vapors - T3 increased from +15% Rush Speed to +20% [BalanceAssessment:"buff"]
 - Nurse Harrow: Healing Needles - Heal Per Shot reduced from 25 to 22 [BalanceAssessment:"nerf"]
 - Nurse Harrow: Healing Needles - T2 Heal Per Shot reduced from +20 to +16 [BalanceAssessment:"nerf"]
 - Nurse Harrow: Healing Needles - Spirit scaling increased from 0.2 to 0.24 [BalanceAssessment:"buff"]
-- Nurse Harrow: Lurking Terrors - Fear buildup time increased from 1.3s to 2s [BalanceAssessment:"buff"]
-- Nurse Harrow: Lurking Terrors - Enemies no longer build fear when Nurse is more than 50 degrees above or below their view
+- Nurse Harrow: Lurking Terrors - Fear buildup time increased from 1.3s to 2s [BalanceAssessment:"nerf"]
+- Nurse Harrow: Lurking Terrors - Enemies no longer build fear when Nurse is more than 50 degrees above or below their view [BalanceAssessment:"nerf"]
 - Nurse Harrow: Lurking Terrors - T3 changed from "Immune to damage while channeling" to "Takes 50% Reduced Damage while channeling" [BalanceAssessment:"nerf"]
 
 - Paige: Base bullet damage reduced from 35 to 32 [BalanceAssessment:"nerf"]
@@ -234,20 +234,20 @@ Heroes:
 - Shiv: Serrated Knives - Rage damage increased from 3.5% Current Health to 4% [BalanceAssessment:"buff"]
 - Shiv: Serrated Knives - T3 now also increases rage damage spirit scaling by +0.01 [BalanceAssessment:"buff"]
 - Shiv: Bloodletting - Fixed damage ticks playing audio
-- Shiv: Killing Blow - Recast duration reduced from 16s to 12s [BalanceAssessment:"nerf"]
+- Shiv: Killing Blow - Recast duration reduced from 16s to 12s [BalanceAssessment:"buff"]
 
 - Silver: Base health regen increased from 2.5 to 3 [BalanceAssessment:"buff"]
-- Silver: Entangling Bola - Fixed Unstoppable flying targets being made to fall
+- Silver: Entangling Bola - Fixed Unstoppable flying targets being made to fall [BalanceAssessment:"buff"]
 - Silver: Entangling Bola - Fixed not grounding Grey Talon during his Rain of Arrows
-- Silver: Go For The Throat - Now counts weapon damage from Point Blank and Opening Rounds
+- Silver: Go For The Throat - Now counts weapon damage from Point Blank and Opening Rounds [BalanceAssessment:"buff"]
 
 - Solomon: Gun now deals -20% headshot damage [BalanceAssessment:"nerf"]
 - Solomon: Base bullet damage reduced from 30 to 25 [BalanceAssessment:"nerf"]
 - Solomon: Polished slide animations, added new ability and item aim poses, and adjusted run-to-stop timing
-- Solomon: Setup Bishop - Square height reduced from 4m to 1m
+- Solomon: Setup Bishop - Square height reduced from 4m to 1m [BalanceAssessment:"nerf"]
 - Solomon: Setup Bishop - On Square spirit scaling increased from 0.64 to 0.85 [BalanceAssessment:"buff"]
 - Solomon: Setup Bishop - T1 increased from +15% slow to +25% [BalanceAssessment:"buff"]
-- Solomon: Setup Bishop - T3 Spirit Resist reduction is now applied on impact instead of by squares
+- Solomon: Setup Bishop - T3 Spirit Resist reduction is now applied on impact instead of by squares [BalanceAssessment:"nerf"]
 - Solomon: Setup Bishop - T3 increased from -2.5% to -5% Spirit Resist per stack (max reduction unchanged) [BalanceAssessment:"buff"]
 - Solomon: Rook Battery - Damage scaling reduced from 1.3 to 0.9 [BalanceAssessment:"nerf"]
 - Solomon: Rook Battery - T3 reduced from -12s cooldown to -10s [BalanceAssessment:"buff"]
@@ -256,10 +256,10 @@ Heroes:
 - Solomon: Develop Queen - Delay for stun tiles increased from 1s to 1.2s [BalanceAssessment:"nerf"]
 - Solomon: Develop Queen - Improved warning effects on the stun tiles to make it clear its just those tiles rather than the full area
 - Solomon: Develop Queen - Fixed hitting things outside of the intended square volumes
-- Solomon: Develop Queen - Base ability now has the checkmate behavior for heroes under 100 Health (scales +5/boon)
-- Solomon: Develop Queen - T2 now increases checkmate threshold by 150
+- Solomon: Develop Queen - Base ability now has the checkmate behavior for heroes under 100 Health (scales +5/boon) [BalanceAssessment:"buff"]
+- Solomon: Develop Queen - T2 now increases checkmate threshold by 150 [BalanceAssessment:"buff"]
 - Solomon: Move Piece - Range to grab pieces increased from 50m to 65m [BalanceAssessment:"buff"]
-- Solomon: Move Piece - Improved placement: pieces no longer fall through geometry or end up under the map, land closer to where you aim, and can now be placed closer to walls and in hallways
+- Solomon: Move Piece - Improved placement: pieces no longer fall through geometry or end up under the map, land closer to where you aim, and can now be placed closer to walls and in hallways [BalanceAssessment:"adjust"]
 
 - Venator: Ira Domini - Blessed stake damage reduced from 115 to 95 [BalanceAssessment:"nerf"]
 - Venator: Ira Domini - Blessed stake damage boon scaling increased from 3 to 3.6 [BalanceAssessment:"buff"]
@@ -270,27 +270,27 @@ Heroes:
 - Violet: Still Life - Stun duration reduced from 1.0s to 0.9s [BalanceAssessment:"nerf"]
 - Violet: Still Life - Line of sight is now required when the channel ends, even during the grace period
 - Violet: Still Life - Now shows a text bar to the victim
-- Violet: Still Life - Sketches now grant +2% healing amp from Nurse Harrow, Kelvin, Ivy, Dynamo, Paige, and Rem instead
-- Violet: Still Life - Sketches changed to give Spirit Power instead of Weapon Damage for Grey Talon, Infernus and Mina
-- Violet: Still Life - T1 health regen is now only granted while drawing (still refreshes for 4s on pickup)
+- Violet: Still Life - Sketches now grant +2% healing amp from Nurse Harrow, Kelvin, Ivy, Dynamo, Paige, and Rem instead [BalanceAssessment:"adjust"]
+- Violet: Still Life - Sketches changed to give Spirit Power instead of Weapon Damage for Grey Talon, Infernus and Mina [BalanceAssessment:"adjust"]
+- Violet: Still Life - T1 health regen is now only granted while drawing (still refreshes for 4s on pickup) [BalanceAssessment:"adjust"]
 - Violet: Still Life - T1 health regen scaling reduced from 0.25 to 0.15 [BalanceAssessment:"nerf"]
 - Violet: Still Life - T3 stun duration increased from +0.35s to +0.45s [BalanceAssessment:"buff"]
 - Violet: Abstract Landscape - Cooldown increased from 165s to 180s [BalanceAssessment:"nerf"]
 - Violet: Abstract Landscape - Duration spirit scaling reduced from 0.04 to 0.01 [BalanceAssessment:"nerf"]
-- Violet: Abstract Landscape - Now ends early if Violet dies
+- Violet: Abstract Landscape - Now ends early if Violet dies [BalanceAssessment:"nerf"]
 - Violet: Abstract Landscape - Cooldown between times you can be affected by it increased from 0.5s to 0.75s [BalanceAssessment:"nerf"]
 - Violet: Abstract Landscape - T3 no longer has "Ink is no longer destroyed"
 
 - Viscous: Alt fire damage growth per boon increased by 5% [BalanceAssessment:"buff"]
 - Viscous: Splatter - T1 increased from +36 Damage to +45 Damage [BalanceAssessment:"buff"]
-- Viscous: Goo Ball - Fixed being able to heavy melee or activate Ethereal Shift during the cast delay
+- Viscous: Goo Ball - Fixed being able to heavy melee or activate Ethereal Shift during the cast delay [BalanceAssessment:"adjust"]
 - Viscous: Goo Ball - Fixed the direction indicator not appearing
 
-- Warden: Alchemical Flask - Now travels 40% faster (overall cast range unchanged)
+- Warden: Alchemical Flask - Now travels 40% faster (overall cast range unchanged) [BalanceAssessment:"buff"]
 - Warden: Alchemical Flask - Weapon Damage reduction increased from -25% to -30% [BalanceAssessment:"buff"]
 - Warden: Willpower - Speed bonus increased from +15% to +20% [BalanceAssessment:"buff"]
 - Warden: Last Stand - T2 increased from +40.5 DPS to +50 [BalanceAssessment:"buff"]
-- Warden: Last Stand - T2 cooldown reduction increased from -30s to -40s [BalanceAssessment:"nerf"]
+- Warden: Last Stand - T2 cooldown reduction increased from -30s to -40s [BalanceAssessment:"buff"]
 
 - Wraith: Card Trick - Heal reduced from 60 to 45 [BalanceAssessment:"nerf"]
 - Wraith: Project Mind - Cooldown increased from 46s to 50s [BalanceAssessment:"nerf"]
@@ -309,8 +309,8 @@ Street Brawl:
 - Deadman Danny: Chimera Mk1 - Cooldown refund on hit from T3 reduced from 50% to 30% [BalanceAssessment:"buff"]
 
 - Nurse Harrow: Leech Therapy - Leeches on the ground are now removed on round reset
-- Nurse: Lurking Terrors - Duration reduced from 7s to 5s [BalanceAssessment:"nerf"]
-- Nurse: Lurking Terrors - T3 reduced from +3s Duration to +2s [BalanceAssessment:"nerf"]
+- Nurse Harrow:: Lurking Terrors - Duration reduced from 7s to 5s [BalanceAssessment:"nerf"]
+- Nurse Harrow:: Lurking Terrors - T3 reduced from +3s Duration to +2s [BalanceAssessment:"nerf"]
 
 - Paige: Bookwyrm - T2 Trail Duration reduced from +2s to +1s [BalanceAssessment:"nerf"]
 
