@@ -80,5 +80,6 @@ export type ChangeGroupOverride = {
 
 export type PatchOverride = {
   patchId: string;
+  originalUrl?: string | null;
   changeGroups?: Record<string, ChangeGroupOverride>;
 };

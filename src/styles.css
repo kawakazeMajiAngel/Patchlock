@@ -975,8 +975,13 @@ body {
 }
 
 .assessment-editor-page {
-  max-width: 980px;
-  padding-top: 8vh;
+  margin-top: 48px;
+  padding-top: 0;
+}
+
+.assessment-editor-page > h2 {
+  margin: 12px 0;
+  font-size: 1.8rem;
 }
 
 .assessment-editor-toolbar {
@@ -1065,6 +1070,32 @@ body {
 }
 
 .assessment-save-status {
+  color: #48d27f;
+}
+
+.assessment-disclaimer {
+  margin: 12px 0 0;
+  color: #737b89;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.settings-page {
+  max-width: 760px;
+}
+
+.settings-form {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-form .help-text,
+.settings-form .error-message,
+.settings-form .settings-save-status {
+  margin: 0;
+}
+
+.settings-save-status {
   color: #48d27f;
 }
 

@@ -1,4 +1,4 @@
-import type { Patch } from "../types/patch";
+import type { Patch, PatchOverride } from "../types/patch";
 import { isPatch, parsePatch } from "./validation";
 
 type PatchIndex = {
@@ -64,5 +64,27 @@ export async function loadStandardPatches(): Promise<Patch[]> {
     const leftDate = left.publishedAt ?? left.importedAt;
     const rightDate = right.publishedAt ?? right.importedAt;
     return rightDate.localeCompare(leftDate);
+  });
+}
+
+export function applyPatchOverrides(
+  patches: Patch[],
+  overrides: PatchOverride[],
+): Patch[] {
+  const overridesByPatchId = new Map(
+    overrides.map((override) => [override.patchId, override]),
+  );
+
+  return patches.map((patch) => {
+    const originalUrl = overridesByPatchId.get(patch.id)?.originalUrl;
+    if (originalUrl === undefined) return patch;
+
+    const updatedPatch = { ...patch };
+    if (originalUrl === null) {
+      delete updatedPatch.URL;
+    } else {
+      updatedPatch.URL = originalUrl;
+    }
+    return updatedPatch;
   });
 }

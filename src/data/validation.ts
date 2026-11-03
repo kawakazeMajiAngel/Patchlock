@@ -142,6 +142,9 @@ export function isPatchOverride(value: unknown): value is PatchOverride {
     isRecord(value) &&
     isString(value.patchId) &&
     value.patchId.length > 0 &&
+    (value.originalUrl === undefined ||
+      value.originalUrl === null ||
+      isOptionalSourceUrl(value.originalUrl)) &&
     (value.changeGroups === undefined ||
       (isRecord(value.changeGroups) &&
         Object.values(value.changeGroups).every(isChangeGroupOverride)))

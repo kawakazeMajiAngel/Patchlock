@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { loadStandardPatches } from "./data/patches";
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { applyPatchOverrides, loadStandardPatches } from "./data/patches";
 import { loadStoredData } from "./data/storage";
-import BalanceAssessmentEditor from "./BalanceAssessmentEditor";
+import Settings from "./Settings";
 import { AbilityImage, EntityImage } from "./PatchImages";
 import { PATCH_SECTIONS } from "./types/patch";
 import type {
@@ -86,7 +86,10 @@ function Archive() {
     Promise.all([loadStandardPatches(), loadStoredData()])
       .then(([standardPatches, storedData]) => {
         if (!active) return;
-        const merged = mergePatchCollections(standardPatches, storedData.userPatches);
+        const merged = applyPatchOverrides(
+          mergePatchCollections(standardPatches, storedData.userPatches),
+          storedData.overrides,
+        );
         setPatches(merged);
         if (merged.length > 0) {
           setSelectedPatchId((current) => current ?? merged[0].id);
@@ -218,7 +221,7 @@ function Archive() {
         </Link>
         <nav className="archive-nav" aria-label="Main navigation">
           <Link to="/search">Search</Link>
-          {import.meta.env.DEV && <Link to="/assessments">Assessments</Link>}
+          <Link to="/settings">Settings</Link>
         </nav>
       </header>
       {error ? (
@@ -495,6 +498,9 @@ function Archive() {
                 })
               )}
             </div>
+            <p className="assessment-disclaimer">
+              Assessments are automatically generated based on the changes and provided for reference only.
+            </p>
           </section>
 
         </>
@@ -518,7 +524,12 @@ function Search() {
     Promise.all([loadStandardPatches(), loadStoredData()])
       .then(([standardPatches, storedData]) => {
         if (!active) return;
-        setPatches(mergePatchCollections(standardPatches, storedData.userPatches));
+        setPatches(
+          applyPatchOverrides(
+            mergePatchCollections(standardPatches, storedData.userPatches),
+            storedData.overrides,
+          ),
+        );
       })
       .catch((loadError: unknown) => {
         if (!active) return;
@@ -616,6 +627,9 @@ function Search() {
             />
           </label>
         </div>
+        <p className="assessment-disclaimer">
+          Assessments are automatically generated based on the changes and provided for reference only.
+        </p>
       </section>
 
       <section className="data-section results-panel">
@@ -669,12 +683,8 @@ export default function App() {
       <Route path="/" element={<Archive />} />
       <Route path="/archive" element={<Archive />} />
       <Route path="/search" element={<Search />} />
-      <Route
-        path="/assessments"
-        element={
-          import.meta.env.DEV ? <BalanceAssessmentEditor /> : <Archive />
-        }
-      />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/assessments" element={<Navigate to="/settings" replace />} />
       <Route path="*" element={<Archive />} />
     </Routes>
   );
