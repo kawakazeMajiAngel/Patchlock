@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { assessBalanceChange } from "./data/assessBalanceChange";
 import { loadStandardPatches } from "./data/patches";
 import { AbilityImage, EntityImage } from "./PatchImages";
@@ -261,14 +260,11 @@ export default function BalanceAssessmentEditor() {
   };
 
   return (
-    <main className="dashboard assessment-editor-page">
-      <Link className="back-link" to="/">
-        ← Patch Archive
-      </Link>
+    <section className="assessment-editor-page">
       <div className="eyebrow">DEVELOPMENT TOOL</div>
-      <h1>Balance Assessments</h1>
+      <h2>Balance Assessments</h2>
       <p className="intro">
-        各変更の評価を手動選択するか、未評価の変更を判断基準に基づいて自動設定します。内容を確認して保存すると、Git管理対象のパッチノート原文に反映されます。
+        各変更の評価を手動選択するか、未評価の変更を判断基準に基づいて自動設定します。内容を確認して保存すると、パッチノート原文に反映されます。
       </p>
 
       {loading ? (
@@ -496,6 +492,6 @@ export default function BalanceAssessmentEditor() {
           </section>
         </>
       )}
-    </main>
+    </section>
   );
 }
