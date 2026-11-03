@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { applyPatchOverrides, loadStandardPatches } from "./data/patches";
 import { loadStoredData } from "./data/storage";
+import Analytics from "./Analytics";
 import Settings from "./Settings";
 import { AbilityImage, EntityImage } from "./PatchImages";
 import { PATCH_SECTIONS } from "./types/patch";
@@ -679,17 +680,20 @@ function Search() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Archive />} />
-      <Route path="/archive" element={<Archive />} />
-      <Route path="/search" element={<Search />} />
-      {import.meta.env.DEV && (
-        <>
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/assessments" element={<Navigate to="/settings" replace />} />
-        </>
-      )}
-      <Route path="*" element={<Archive />} />
-    </Routes>
+    <>
+      <Analytics />
+      <Routes>
+        <Route path="/" element={<Archive />} />
+        <Route path="/archive" element={<Archive />} />
+        <Route path="/search" element={<Search />} />
+        {import.meta.env.DEV && (
+          <>
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/assessments" element={<Navigate to="/settings" replace />} />
+          </>
+        )}
+        <Route path="*" element={<Archive />} />
+      </Routes>
+    </>
   );
 }

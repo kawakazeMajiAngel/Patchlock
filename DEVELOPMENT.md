@@ -60,6 +60,19 @@ Remove-Item Env:VITE_BASE_PATH
 
 `VITE_BASE_PATH` を設定しない場合、通常のローカル開発・ビルドでは `/` が使われます。
 
+## Google Analytics 4
+
+GA4のウェブデータストリームを作成し、測定ID（`G-...`）を取得します。ローカルで計測する場合は、開発サーバーを起動する前に環境変数を設定します。
+
+```powershell
+$env:VITE_GA_MEASUREMENT_ID = "G-XXXXXXXXXX"
+npm run dev
+```
+
+GitHub Pagesの本番サイトで計測する場合は、GitHubリポジトリの **Settings → Secrets and variables → Actions → Variables** で `GA_MEASUREMENT_ID` というリポジトリ変数を作成し、値に測定IDを設定します。測定IDは秘密情報ではないため、SecretではなくVariableを使います。設定後、`main` へpushするかワークフローを手動実行して再デプロイしてください。
+
+測定IDが未設定ならGAタグは読み込まれず、計測も行われません。画面遷移ごとのページビューは自動送信されるため、GA4の拡張計測にあるブラウザー履歴ベースのページビュー計測は重複防止のため無効にしてください。計測を公開する前に、利用者への説明とプライバシー関連の案内も確認してください。
+
 ## GitHub Pagesへのデプロイ
 
 1. 変更をGitHubリポジトリの `main` ブランチへpushします。

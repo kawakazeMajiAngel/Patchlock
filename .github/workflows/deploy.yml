@@ -33,6 +33,7 @@ jobs:
         run: npm run build
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
+          VITE_GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
       - name: Configure SPA fallback
         run: cp dist/index.html dist/404.html
       - name: Upload artifact

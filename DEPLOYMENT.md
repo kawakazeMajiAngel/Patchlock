@@ -88,6 +88,10 @@ git@github-new:アカウント名/Patchlock.git
 
 GitHubで作成したリポジトリを開き、**Settings → Pages** に移動します。公開元を **GitHub Actions** に設定してください。
 
+## Google Analytics 4を設定する場合
+
+GA4のウェブデータストリームで測定ID（`G-...`）を取得し、リポジトリの **Settings → Secrets and variables → Actions → Variables** から `GA_MEASUREMENT_ID` というリポジトリ変数を作成します。値に測定IDを設定して `main` へpushするか、Actionsからデプロイを手動実行してください。測定IDが未設定ならサイトは計測タグを読み込みません。
+
 ## 5. デプロイ結果を確認する
 
 `main` へのpushを契機に、Actionsの `Deploy to GitHub Pages` ワークフローが実行されます。リポジトリの **Actions** タブを開き、最新の実行が成功したことを確認します。初回公開には少し時間がかかる場合があります。
