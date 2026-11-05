@@ -46,19 +46,20 @@ export function AbilityImage({
   heroId: string;
   abilityName: string | undefined;
 }) {
-  const heroDirectory = heroId.replace(/-/g, "_");
+  const heroDirectory =
+    heroId === "mo-krill" ? "mo_and_krill" : heroId.replace(/-/g, "_");
   const abilityFile = (abilityName ?? "")
     .toLowerCase()
     .trim()
-    .replace(/'/g, "%2527")
-    .replace(/[^a-z0-9%]+/g, "_")
+    .replace(/[^a-z0-9',!]+/g, "_")
     .replace(/^_+|_+$/g, "");
+  const encodedAbilityFile = abilityFile.replace(/'/g, "%27");
 
   return (
     <span className="ability-image-slot" aria-hidden="true">
       {abilityFile && (
         <img
-          src={`${ENTITY_IMAGE_BASE_PATH}/abilities/${heroDirectory}/${abilityFile}.png`}
+          src={`${ENTITY_IMAGE_BASE_PATH}/abilities/${heroDirectory}/${encodedAbilityFile}.png`}
           alt=""
           loading="lazy"
           onError={(event) => {
