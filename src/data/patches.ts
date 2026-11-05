@@ -70,12 +70,14 @@ export async function loadStandardPatches(): Promise<Patch[]> {
 export function applyPatchOverrides(
   patches: Patch[],
   overrides: PatchOverride[],
+  standardPatchIds: ReadonlySet<string> = new Set(),
 ): Patch[] {
   const overridesByPatchId = new Map(
     overrides.map((override) => [override.patchId, override]),
   );
 
   return patches.map((patch) => {
+    if (standardPatchIds.has(patch.id)) return patch;
     const originalUrl = overridesByPatchId.get(patch.id)?.originalUrl;
     if (originalUrl === undefined) return patch;
 

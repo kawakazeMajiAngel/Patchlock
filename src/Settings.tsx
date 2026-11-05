@@ -25,6 +25,9 @@ function isHttpUrl(value: string): boolean {
 export default function Settings() {
   const [patches, setPatches] = useState<Patch[]>([]);
   const [overrides, setOverrides] = useState<PatchOverride[]>([]);
+  const [standardPatchIds, setStandardPatchIds] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
   const [selectedPatchId, setSelectedPatchId] = useState("");
   const [originalUrl, setOriginalUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -37,9 +40,12 @@ export default function Settings() {
     Promise.all([loadStandardPatches(), loadStoredData()])
       .then(([standardPatches, storedData]) => {
         if (!active) return;
+        const standardPatchIds = new Set(standardPatches.map(({ id }) => id));
+        setStandardPatchIds(standardPatchIds);
         const merged = applyPatchOverrides(
           mergePatchCollections(standardPatches, storedData.userPatches),
           storedData.overrides,
+          standardPatchIds,
         );
         setPatches(merged);
         setOverrides(storedData.overrides);
@@ -82,22 +88,58 @@ export default function Settings() {
       const currentOverride = overrides.find(
         ({ patchId }) => patchId === selectedPatch.id,
       );
-      const nextOverride: PatchOverride = {
-        ...currentOverride,
-        patchId: selectedPatch.id,
-        originalUrl: originalUrl.trim() || null,
-      };
-      await savePatchOverride(nextOverride);
+      let nextPatches = patches;
+      if (standardPatchIds.has(selectedPatch.id)) {
+        const response = await fetch(
+          `${import.meta.env.BASE_URL}__dev/patch-original-link`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              patchId: selectedPatch.id,
+              url: originalUrl.trim() || null,
+            }),
+          },
+        );
+        if (!response.ok) {
+          const detail = await response.text();
+          throw new Error(detail || `保存に失敗しました (${response.status})`);
+        }
 
-      const nextOverrides = [
-        ...overrides.filter(({ patchId }) => patchId !== selectedPatch.id),
-        nextOverride,
-      ];
-      const nextPatches = applyPatchOverrides(patches, [nextOverride]);
-      setOverrides(nextOverrides);
-      setPatches(nextPatches);
-      setOriginalUrl(nextPatches.find(({ id }) => id === selectedPatch.id)?.URL ?? "");
-      setStatus("設定を保存しました。");
+        const updatedStandardPatches = await loadStandardPatches();
+        nextPatches = mergePatchCollections(
+          updatedStandardPatches,
+          patches.filter(({ id }) => !standardPatchIds.has(id)),
+        );
+        setPatches(nextPatches);
+      } else {
+        const nextOverride: PatchOverride = {
+          ...currentOverride,
+          patchId: selectedPatch.id,
+          originalUrl: originalUrl.trim() || null,
+        };
+        await savePatchOverride(nextOverride);
+
+        const nextOverrides = [
+          ...overrides.filter(({ patchId }) => patchId !== selectedPatch.id),
+          nextOverride,
+        ];
+        nextPatches = applyPatchOverrides(
+          patches,
+          [nextOverride],
+          standardPatchIds,
+        );
+        setOverrides(nextOverrides);
+        setPatches(nextPatches);
+      }
+      setOriginalUrl(
+        nextPatches.find(({ id }) => id === selectedPatch.id)?.URL ?? "",
+      );
+      setStatus(
+        standardPatchIds.has(selectedPatch.id)
+          ? "patchnote/ の原文に保存しました。変更をコミットしてデプロイすると本番環境に反映されます。"
+          : "このパッチの設定をブラウザーに保存しました（本番環境には反映されません）。",
+      );
     } catch (saveError: unknown) {
       setError(
         saveError instanceof Error
@@ -117,7 +159,7 @@ export default function Settings() {
       <div className="eyebrow">PATCH ARCHIVE</div>
       <h1>Settings</h1>
       <p className="intro">
-        パッチごとのoriginalリンクを設定します。リンクはこのブラウザーに保存され、アーカイブ画面にも反映されます。
+        標準パッチのoriginalリンクはpatchnote/の原文に保存されます。変更をコミットしてデプロイすると本番環境に反映されます。ユーザーパッチのリンクはこのブラウザー内に保存されます。
       </p>
 
       {loading ? (
@@ -167,6 +209,8 @@ export default function Settings() {
           </label>
           <p className="help-text">
             空欄にして保存するとリンクを削除します。http:// または https:// のURLを入力してください。
+            {selectedPatch && standardPatchIds.has(selectedPatch.id) && !import.meta.env.DEV &&
+              " 原文の編集は開発環境でのみ行えます。"}
           </p>
 
           {error && <p className="error-message" role="alert">{error}</p>}
@@ -181,7 +225,14 @@ export default function Settings() {
             className="primary-button"
             type="button"
             onClick={saveSettings}
-            disabled={saving || !isDirty || !canSave}
+            disabled={
+              saving ||
+              !isDirty ||
+              !canSave ||
+              (selectedPatch !== null &&
+                standardPatchIds.has(selectedPatch.id) &&
+                !import.meta.env.DEV)
+            }
           >
             {saving ? "Saving…" : "Save settings"}
           </button>

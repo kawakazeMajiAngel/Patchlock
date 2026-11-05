@@ -90,6 +90,7 @@ function Archive() {
         const merged = applyPatchOverrides(
           mergePatchCollections(standardPatches, storedData.userPatches),
           storedData.overrides,
+          new Set(standardPatches.map(({ id }) => id)),
         );
         setPatches(merged);
         if (merged.length > 0) {
@@ -529,6 +530,7 @@ function Search() {
           applyPatchOverrides(
             mergePatchCollections(standardPatches, storedData.userPatches),
             storedData.overrides,
+            new Set(standardPatches.map(({ id }) => id)),
           ),
         );
       })

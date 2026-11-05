@@ -203,7 +203,6 @@ export function parsePatchText(
     const sourceUrlMatch = trimmed.match(/^- URL:\s*(.+)$/);
     if (sourceUrlMatch) {
       sourceUrl = sourceUrlMatch[1].trim();
-      firstNonEmptyLine = false;
       continue;
     }
 

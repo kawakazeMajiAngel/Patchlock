@@ -25,6 +25,11 @@ type AssessmentUpdate = {
   assessment: BalanceAssessment;
 };
 
+type OriginalLinkUpdate = {
+  patchId: string;
+  url: string | null;
+};
+
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 const balanceAssessments: BalanceAssessment[] = [
@@ -60,6 +65,25 @@ function isAssessmentSaveRequest(
     new Set(value.changes.map(({ sourceLineId }) => sourceLineId)).size ===
       value.changes.length
   );
+}
+
+function isOriginalLinkUpdate(value: unknown): value is OriginalLinkUpdate {
+  if (!isRecord(value) || typeof value.patchId !== "string") return false;
+  if (value.url === null) return true;
+  if (
+    typeof value.url !== "string" ||
+    value.url.length > 2048 ||
+    /[\r\n]/.test(value.url)
+  ) {
+    return false;
+  }
+
+  try {
+    const protocol = new URL(value.url).protocol;
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 async function generatePatchnoteAssets(): Promise<GeneratedPatchnoteAssets> {
@@ -147,6 +171,90 @@ function patchnotePlugin(): Plugin {
           request.url ?? "/",
           "http://localhost",
         ).pathname;
+        if (/(?:^|\/)__dev\/patch-original-link$/.test(pathname)) {
+          if (request.method !== "POST") {
+            response.statusCode = 405;
+            response.setHeader("Allow", "POST");
+            response.end("Method Not Allowed");
+            return;
+          }
+
+          try {
+            let body = "";
+            for await (const chunk of request) {
+              body += chunk.toString();
+              if (body.length > 1024 * 1024) {
+                response.statusCode = 413;
+                response.end("Request body is too large.");
+                return;
+              }
+            }
+
+            let value: unknown;
+            try {
+              value = JSON.parse(body);
+            } catch {
+              response.statusCode = 400;
+              response.end("Invalid JSON request.");
+              return;
+            }
+            if (!isOriginalLinkUpdate(value)) {
+              response.statusCode = 400;
+              response.end("Invalid original link update.");
+              return;
+            }
+
+            const generated = await generatePatchnoteAssets();
+            const sourcePath = generated.sourcePathsByPatchId.get(value.patchId);
+            if (!sourcePath) {
+              response.statusCode = 404;
+              response.end("Patch not found in patchnote sources.");
+              return;
+            }
+
+            const original = await readFile(sourcePath, "utf8");
+            const newline = original.includes("\r\n") ? "\r\n" : "\n";
+            const lines = original.split(/\r?\n/);
+            const urlLineIndexes = lines.flatMap((line, index) =>
+              /^\s*-\s*URL\s*:/i.test(line) ? [index] : [],
+            );
+            if (value.url === null) {
+              for (const index of urlLineIndexes.reverse()) {
+                lines.splice(index, 1);
+              }
+            } else {
+              for (const index of urlLineIndexes.reverse()) {
+                lines.splice(index, 1);
+              }
+              lines.unshift(`- URL: ${value.url}`);
+            }
+
+            const temporaryPath = `${sourcePath}.${randomUUID()}.tmp`;
+            try {
+              await writeFile(temporaryPath, lines.join(newline), {
+                encoding: "utf8",
+                flag: "wx",
+              });
+              await rename(temporaryPath, sourcePath);
+            } finally {
+              await rm(temporaryPath, { force: true });
+            }
+
+            response.statusCode = 200;
+            response.setHeader("Content-Type", "application/json; charset=utf-8");
+            response.end(JSON.stringify({ saved: true }));
+          } catch (error) {
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Original link could not be saved.";
+            server.config.logger.error(message);
+            response.statusCode = 500;
+            response.end("Unable to save original link.");
+          }
+          return;
+        }
+
         if (/(?:^|\/)__dev\/patch-assessments$/.test(pathname)) {
           if (request.method !== "POST") {
             response.statusCode = 405;
